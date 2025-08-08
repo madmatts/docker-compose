@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # --- Serwer TeamCity ---
+  teamcity-server:
+    image: jetbrains/teamcity-server:latest
+    container_name: teamcity-server
+    ports:
+      # Mapujemy port 8111 kontenera na port 8111 na naszym komputerze
+      - "8111:8111"
+    volumes:
+      # Ścieżki względne działają poprawnie na Windows z Docker Compose
+      - E:\docker\teamcity\server\data:/data/teamcity_server/datadir
+      - E:\docker\teamcity\server\logs:/opt/teamcity/logs
+    environment:
+      # Ustawienie opcji JVM dla serwera (opcjonalne, ale zalecane)
+      - TEAMCITY_SERVER_MEM_OPTS="-Xmx2g"
+
+  # --- Agent Budujący TeamCity ---
+  teamcity-agent:
+    image: jetbrains/teamcity-agent:latest
+    container_name: teamcity-agent
+    depends_on:
+      - teamcity-server
+    environment:
+      # Adres serwera w sieci Docker Compose - ta składnia jest poprawna i uniwersalna
+      - SERVER_URL=http://teamcity-server:8111
+    volumes:
+      # Montujemy katalog na konfigurację agenta
+      - E:\docker\teamcity\agent\conf:/data/teamcity_agent/conf
+      # KLUCZOWA ZMIANA DLA WINDOWS:
+      # Montowanie gniazda Docker, aby agent mógł wykonywać komendy docker
+      - "//var/run/docker.sock:/var/run/docker.sock"
