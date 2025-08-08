@@ -1,33 +1,37 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # --- Serwer TeamCity ---
   teamcity-server:
     image: jetbrains/teamcity-server:latest
     container_name: teamcity-server
     ports:
-      # Mapujemy port 8111 kontenera na port 8111 na naszym komputerze
       - "8111:8111"
-    volumes:
-      # Ścieżki względne działają poprawnie na Windows z Docker Compose
-      - E:\docker\teamcity\server\data:/data/teamcity_server/datadir
-      - E:\docker\teamcity\server\logs:/opt/teamcity/logs
     environment:
-      # Ustawienie opcji JVM dla serwera (opcjonalne, ale zalecane)
-      - TEAMCITY_SERVER_MEM_OPTS="-Xmx2g"
+      - TEAMCITY_SERVER_MEM_OPTS=-Xms1g -Xmx2g
+      - TEAMCITY_PUBLIC_URL=http://localhost:8111
+    volumes:
+      - C:/Users/mateu/Programing/docker/team-city-compose/server/data:/data/teamcity_server/datadir
+      - C:/Users/mateu/Programing/docker/team-city-compose/server/logs:/opt/teamcity/logs
+    restart: unless-stopped
+    networks:
+      - teamcity
 
-  # --- Agent Budujący TeamCity ---
   teamcity-agent:
     image: jetbrains/teamcity-agent:latest
-    container_name: teamcity-agent
+    container_name: teamcity-agent-1
     depends_on:
       - teamcity-server
     environment:
-      # Adres serwera w sieci Docker Compose - ta składnia jest poprawna i uniwersalna
       - SERVER_URL=http://teamcity-server:8111
+      - AGENT_NAME=local-docker-agent-1
     volumes:
-      # Montujemy katalog na konfigurację agenta
-      - E:\docker\teamcity\agent\conf:/data/teamcity_agent/conf
-      # KLUCZOWA ZMIANA DLA WINDOWS:
-      # Montowanie gniazda Docker, aby agent mógł wykonywać komendy docker
-      - "//var/run/docker.sock:/var/run/docker.sock"
+      - C:/Users/mateu/Programing/docker/team-city-compose/agent/data:/data/teamcity_agent
+      # Optional: Uncomment if you want Docker builds inside the agent
+      # - //var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    networks:
+      - teamcity
+
+networks:
+  teamcity:
+    driver: bridge
