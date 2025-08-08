@@ -1,33 +1,52 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # --- Serwer TeamCity ---
   teamcity-server:
     image: jetbrains/teamcity-server:latest
     container_name: teamcity-server
     ports:
-      # Mapujemy port 8111 kontenera na port 8111 na naszym komputerze
       - "8111:8111"
-    volumes:
-      # Ścieżki względne działają poprawnie na Windows z Docker Compose
-      - E:\docker\teamcity\server\data:/data/teamcity_server/datadir
-      - E:\docker\teamcity\server\logs:/opt/teamcity/logs
     environment:
-      # Ustawienie opcji JVM dla serwera (opcjonalne, ale zalecane)
-      - TEAMCITY_SERVER_MEM_OPTS="-Xmx2g"
+      # Tweak memory as needed; 2g is comfortable for local dev
+      - TEAMCITY_SERVER_MEM_OPTS=-Xms1g -Xmx2g
+      # Helps agents/links resolve correctly from the UI
+      - TEAMCITY_PUBLIC_URL=http://localhost:8111
+    volumes:
+      # Persistent server data and logs
+      - teamcity_server_data:/data/teamcity_server/datadir
+      - teamcity_server_logs:/opt/teamcity/logs
+    restart: unless-stopped
+    networks:
+      - teamcity
 
-  # --- Agent Budujący TeamCity ---
   teamcity-agent:
     image: jetbrains/teamcity-agent:latest
-    container_name: teamcity-agent
+    container_name: teamcity-agent-1
     depends_on:
       - teamcity-server
     environment:
-      # Adres serwera w sieci Docker Compose - ta składnia jest poprawna i uniwersalna
+      # IMPORTANT: Use the service name on the same Docker network, not localhost
       - SERVER_URL=http://teamcity-server:8111
+      # You can keep this or omit it to use container hostname as the agent name
+      - AGENT_NAME=local-docker-agent-1
+      # Optional: Pre-authorization token (explained below)
+      # - AGENT_TOKEN=YOUR_GENERATED_TOKEN
     volumes:
-      # Montujemy katalog na konfigurację agenta
-      - E:\docker\teamcity\agent\conf:/data/teamcity_agent/conf
-      # KLUCZOWA ZMIANA DLA WINDOWS:
-      # Montowanie gniazda Docker, aby agent mógł wykonywać komendy docker
-      - "//var/run/docker.sock:/var/run/docker.sock"
+      # Persistent agent data (config, system, caches)
+      - teamcity_agent_data_1:/data/teamcity_agent
+
+      # OPTIONAL: If you want this agent to run Docker commands for your builds,
+      # uncomment the next line to share the Docker socket:
+      # - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    networks:
+      - teamcity
+
+volumes:
+  teamcity_server_data:
+  teamcity_server_logs:
+  teamcity_agent_data_1:
+
+networks:
+  teamcity:
+    driver: bridge
