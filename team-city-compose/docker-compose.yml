@@ -7,14 +7,11 @@ services:
     ports:
       - "8111:8111"
     environment:
-      # Tweak memory as needed; 2g is comfortable for local dev
       - TEAMCITY_SERVER_MEM_OPTS=-Xms1g -Xmx2g
-      # Helps agents/links resolve correctly from the UI
       - TEAMCITY_PUBLIC_URL=http://localhost:8111
     volumes:
-      # Persistent server data and logs
-      - teamcity_server_data:/data/teamcity_server/datadir
-      - teamcity_server_logs:/opt/teamcity/logs
+      - C:/Users/mateu/Programing/docker/team-city-compose/server/data:/data/teamcity_server/datadir
+      - C:/Users/mateu/Programing/docker/team-city-compose/server/logs:/opt/teamcity/logs
     restart: unless-stopped
     networks:
       - teamcity
@@ -25,27 +22,15 @@ services:
     depends_on:
       - teamcity-server
     environment:
-      # IMPORTANT: Use the service name on the same Docker network, not localhost
       - SERVER_URL=http://teamcity-server:8111
-      # You can keep this or omit it to use container hostname as the agent name
       - AGENT_NAME=local-docker-agent-1
-      # Optional: Pre-authorization token (explained below)
-      # - AGENT_TOKEN=YOUR_GENERATED_TOKEN
     volumes:
-      # Persistent agent data (config, system, caches)
-      - teamcity_agent_data_1:/data/teamcity_agent
-
-      # OPTIONAL: If you want this agent to run Docker commands for your builds,
-      # uncomment the next line to share the Docker socket:
-      # - /var/run/docker.sock:/var/run/docker.sock
+      - C:/Users/mateu/Programing/docker/team-city-compose/agent/data:/data/teamcity_agent
+      # Optional: Uncomment if you want Docker builds inside the agent
+      # - //var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
     networks:
       - teamcity
-
-volumes:
-  teamcity_server_data:
-  teamcity_server_logs:
-  teamcity_agent_data_1:
 
 networks:
   teamcity:
