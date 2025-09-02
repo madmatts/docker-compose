@@ -38,8 +38,10 @@ services:
       - AGENT_NAME=local-docker-agent
     volumes:
       - C:/Users/mateu/Programing/docker/team-city-compose/agent/data:/data/teamcity_agent
+      - C:/Users/mateu/Programing/docker/team-city-compose/agent/data/work:/data:/opt/buildagent/work
+      - C:/Users/mateu/Programing/docker/team-city-compose/agent/data/temp:/data:/opt/buildagent/temp
       # Optional: Uncomment if you want Docker builds inside the agent
-      - //var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
     networks:
       - teamcity
@@ -48,6 +50,8 @@ services:
   teamcity-agent-vue:
     # Zamiast 'image' używamy 'build', aby zbudować obraz z lokalnego Dockerfile
     build: .
+    stdin_open: true
+    tty: true
     container_name: teamcity-agent-vue # Nowa, unikalna nazwa kontenera
     user: root # Uruchamiamy jako root, aby mieć uprawnienia do instalacji
     depends_on:
@@ -58,8 +62,11 @@ services:
     volumes:
       # BARDZO WAŻNE: Nowy, osobny katalog dla konfiguracji tego agenta!
       - C:/Users/mateu/Programing/docker/team-city-compose/agent-vue/data:/data:/data/teamcity_agent
-      - //var/run/docker.sock:/var/run/docker.sock
+      - C:/Users/mateu/Programing/docker/team-city-compose/agent-vue/data/temp:/data:/opt/buildagent/temp
+      - C:/Users/mateu/Programing/docker/team-city-compose/agent-vue/data/work:/data:/opt/buildagent/work
+      - "//./pipe/docker_engine:/var/run/docker.sock"
     restart: unless-stopped
+    privileged: true
     networks:
       - teamcity
 

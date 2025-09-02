@@ -15,11 +15,16 @@ RUN apt-get update && \
     apt-get install -y curl gnupg && \
     curl -sL https://deb.nodesource.com/setup_${NODE_VERSION} | bash -
 
+# Install dos2unix
+RUN apt-get update && apt-get install -y dos2unix
+
 # 5. Zainstaluj Node.js oraz, opcjonalnie, menedżer pakietów Yarn.
 # Instalujemy również 'build-essential' na wypadek, gdyby niektóre pakiety npm
 # wymagały kompilacji natywnych dodatków.
 RUN apt-get install -y nodejs build-essential && \
     npm install -g yarn
+
+RUN dos2unix /opt/buildagent/temp/agentTmp/docker-shell-script-*.sh
 
 # 6. Wróć do domyślnego użytkownika 'buildagent', na którym pracuje agent TeamCity.
 # To ważny krok ze względów bezpieczeństwa.
