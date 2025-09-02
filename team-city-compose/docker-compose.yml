@@ -1,6 +1,17 @@
 version: "3.8"
 
 services:
+
+  nexus:
+      image: sonatype/nexus3:latest
+      container_name: nexus
+      ports:
+        - "8081:8081"
+      volumes:
+        - C:/Users/mateu/Programing/docker/nexus-data:/nexus-data
+      restart: unless-stopped
+      environment:
+        NEXUS_ROOT_PASSWORD: changeme123
   teamcity-server:
     image: jetbrains/teamcity-server:latest
     container_name: teamcity-server
@@ -19,15 +30,35 @@ services:
   teamcity-agent:
     image: jetbrains/teamcity-agent:latest
     container_name: teamcity-agent-1
+    user: root
     depends_on:
       - teamcity-server
     environment:
       - SERVER_URL=http://teamcity-server:8111
-      - AGENT_NAME=local-docker-agent-1
+      - AGENT_NAME=local-docker-agent
     volumes:
       - C:/Users/mateu/Programing/docker/team-city-compose/agent/data:/data/teamcity_agent
       # Optional: Uncomment if you want Docker builds inside the agent
-      # - //var/run/docker.sock:/var/run/docker.sock
+      - //var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    networks:
+      - teamcity
+
+  # --- NOWY AGENT DLA VUE.JS ---
+  teamcity-agent-vue:
+    # Zamiast 'image' używamy 'build', aby zbudować obraz z lokalnego Dockerfile
+    build: .
+    container_name: teamcity-agent-vue # Nowa, unikalna nazwa kontenera
+    user: root # Uruchamiamy jako root, aby mieć uprawnienia do instalacji
+    depends_on:
+      - teamcity-server
+    environment:
+      - SERVER_URL=http://teamcity-server:8111
+      - AGENT_NAME=vue-docker-agent # Nowa, unikalna nazwa agenta widoczna w TeamCity
+    volumes:
+      # BARDZO WAŻNE: Nowy, osobny katalog dla konfiguracji tego agenta!
+      - C:/Users/mateu/Programing/docker/team-city-compose/agent-vue/data:/data:/data/teamcity_agent
+      - //var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
     networks:
       - teamcity
