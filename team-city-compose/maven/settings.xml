@@ -16,11 +16,17 @@
   <servers>
     <!-- server id must match the <distributionManagement>/<repository> id or the repository id used in your POMs -->
     <server>
-      <id>local-nexus</id>
+      <id>eavo-releases</id>
       <!-- TeamCity: define environment variables NEXUS_USERNAME and NEXUS_PASSWORD (or replace with secure values) -->
       <username>${env.NEXUS_USERNAME}</username>
       <password>${env.NEXUS_PASSWORD}</password>
     </server>
+
+    <server>
+      <id>eavo-snapshots</id>
+      <!-- TeamCity: define environment variables NEXUS_USERNAME and NEXUS_PASSWORD (or replace with secure values) -->
+      <username>${env.NEXUS_USERNAME}</username>
+      <password>${env.NEXUS_PASSWORD}</password>
   </servers>
 
   <mirrors>
@@ -39,9 +45,9 @@
 
       <repositories>
         <repository>
-          <id>local-nexus-releases</id>
+          <id>eavo-releases</id>
           <name>Local Nexus Releases</name>
-          <url>http://localhost:8081/repository/maven-releases/</url>
+          <url>http://localhost:8081/repository/eavo-be/</url>
           <releases>
             <enabled>true</enabled>
           </releases>
@@ -50,9 +56,9 @@
           </snapshots>
         </repository>
         <repository>
-          <id>local-nexus-snapshots</id>
+          <id>eavo-snapshots</id>
           <name>Local Nexus Snapshots</name>
-          <url>http://localhost:8081/repository/maven-snapshots/</url>
+          <url>http://localhost:8081/repository/eavo-be/</url>
           <releases>
             <enabled>false</enabled>
           </releases>
