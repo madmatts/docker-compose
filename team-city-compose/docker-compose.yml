@@ -12,6 +12,9 @@ services:
       restart: unless-stopped
       environment:
         NEXUS_ROOT_PASSWORD: changeme123
+      networks:
+        - teamcity
+        
   teamcity-server:
     image: jetbrains/teamcity-server:latest
     container_name: teamcity-server
