@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
-                              https://maven.apache.org/xsd/settings-1.0.0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
   <!-- Basic TeamCity-friendly Maven settings.xml
        - Server credentials are read from environment variables (set in TeamCity build configuration)
        - A profile (teamcity) configures Nexus URLs on localhost (adjust ports/paths for your Nexus)
@@ -14,28 +13,24 @@
   <offline>false</offline>
 
   <servers>
-    <!-- server id must match the <distributionManagement>/<repository> id or the repository id used in your POMs -->
+    <!-- server id must match the <distributionManagement>/<repository> id or the repository id used
+    in your POMs -->
     <server>
-      <id>eavo-releases</id>
-      <!-- TeamCity: define environment variables NEXUS_USERNAME and NEXUS_PASSWORD (or replace with secure values) -->
-      <username>${env.NEXUS_USERNAME}</username>
-      <password>${env.NEXUS_PASSWORD}</password>
+      <id>eavo</id>
+      <!-- TeamCity: define environment variables NEXUS_USERNAME and NEXUS_PASSWORD (or replace with
+      secure values) -->
+      <username>eavo</username>
+      <password>eavo</password>
     </server>
-
-    <server>
-      <id>eavo-snapshots</id>
-      <!-- TeamCity: define environment variables NEXUS_USERNAME and NEXUS_PASSWORD (or replace with secure values) -->
-      <username>${env.NEXUS_USERNAME}</username>
-      <password>${env.NEXUS_PASSWORD}</password>
   </servers>
 
   <mirrors>
     <!-- mirrorOf="*" sends all repository requests through Nexus -->
     <mirror>
-      <id>nexus-mirror</id>
-      <name>Local Nexus mirror</name>
-      <url>http://localhost:8081/repository/maven-public/</url>
-      <mirrorOf>*</mirrorOf>
+      <id>central-direct</id>
+      <name>Maven Central</name>
+      <url>https://repo1.maven.org/maven2/</url>
+      <mirrorOf>central</mirrorOf>
     </mirror>
   </mirrors>
 
@@ -47,7 +42,7 @@
         <repository>
           <id>eavo-releases</id>
           <name>Local Nexus Releases</name>
-          <url>http://localhost:8081/repository/eavo-be/</url>
+          <url>http://localhost:8081/repository/eavo-releases/</url>
           <releases>
             <enabled>true</enabled>
           </releases>
@@ -55,10 +50,11 @@
             <enabled>false</enabled>
           </snapshots>
         </repository>
+
         <repository>
           <id>eavo-snapshots</id>
-          <name>Local Nexus Snapshots</name>
-          <url>http://localhost:8081/repository/eavo-be/</url>
+          <name>Local Nexus Releases</name>
+          <url>http://localhost:8081/repository/eavo-snapshots/</url>
           <releases>
             <enabled>false</enabled>
           </releases>
@@ -72,7 +68,7 @@
         <pluginRepository>
           <id>local-nexus-plugins</id>
           <name>Local Nexus Plugin Repo</name>
-          <url>http://localhost:8081/repository/maven-public/</url>
+          <url>https://repo1.maven.org/maven2/</url>
         </pluginRepository>
       </pluginRepositories>
     </profile>

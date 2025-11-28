@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <!-- Basic TeamCity-friendly Maven settings.xml
+       - Server credentials are read from environment variables (set in TeamCity build configuration)
+       - A profile (teamcity) configures Nexus URLs on localhost (adjust ports/paths for your Nexus)
+       - Mirror forwards all requests to Nexus to ensure dependencies/plugins go through Nexus
+  -->
+
+  <localRepository>${user.home}/.m2/repository</localRepository>
+  <interactiveMode>false</interactiveMode>
+  <offline>false</offline>
+
+  <servers>
+    <!-- server id must match the <distributionManagement>/<repository> id or the repository id used
+    in your POMs -->
+    <server>
+      <id>eavo</id>
+      <!-- TeamCity: define environment variables NEXUS_USERNAME and NEXUS_PASSWORD (or replace with
+      secure values) -->
+      <username>eavo</username>
+      <password>eavo</password>
+    </server>
+
+  </servers>
+
+  <mirrors>
+    <!-- mirrorOf="*" sends all repository requests through Nexus -->
+    <mirror>
+      <id>central-direct</id>
+      <name>Maven Central</name>
+      <url>https://repo1.maven.org/maven2/</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+  </mirrors>
+
+  <profiles>
+    <profile>
+      <id>teamcity</id>
+
+      <repositories>
+        <repository>
+          <id>eavo</id>
+          <name>Local Nexus Releases</name>
+          <url>http://nexus:8081/repository/eavo-releases/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+
+        <repository>
+          <id>eavo-snapshots</id>
+          <name>Local Nexus Releases</name>
+          <url>http://nexus:8081/repository/eavo-snapshots/</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+
+      <pluginRepositories>
+        <pluginRepository>
+          <id>local-nexus-plugins</id>
+          <name>Local Nexus Plugin Repo</name>
+          <url>https://repo1.maven.org/maven2/</url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>teamcity</activeProfile>
+  </activeProfiles>
+</settings>
