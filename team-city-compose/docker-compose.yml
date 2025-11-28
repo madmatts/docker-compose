@@ -7,6 +7,7 @@ services:
       container_name: nexus
       ports:
         - "8081:8081"
+        - "8083:8083"
       volumes:
         - C:/Users/mateu/Programing/docker/nexus-data:/nexus-data
       restart: unless-stopped
@@ -67,7 +68,8 @@ services:
       - C:/Users/mateu/Programing/docker/team-city-compose/agent-vue/data:/data:/data/teamcity_agent
       - C:/Users/mateu/Programing/docker/team-city-compose/agent-vue/data/temp:/data:/opt/buildagent/temp
       - C:/Users/mateu/Programing/docker/team-city-compose/agent-vue/data/work:/data:/opt/buildagent/work
-      - "//./pipe/docker_engine:/var/run/docker.sock"
+      # - "//./pipe/docker_engine:/var/run/docker.sock"
+      - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
     privileged: true
     networks:
