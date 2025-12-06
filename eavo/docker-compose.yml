@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_container
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: nastu7@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: pgadmin1
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - eavonet
+
+  postgres:
+    image: postgres:16.2
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: eavo
+      POSTGRES_USER: eavo
+      POSTGRES_PASSWORD: eavo123
+    ports:
+      - "5432:5432"
+    networks:
+      - eavonet
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  postgres-test:
+    image: postgres:16.2
+    container_name: postgres_test_db
+    restart: always
+    environment:
+      POSTGRES_DB: eavo_test
+      POSTGRES_USER: eavo
+      POSTGRES_PASSWORD: eavo123
+    ports:
+      - "5433:5432"
+    networks:
+      - eavonet
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+
+  spring-app:
+    build: ../
+    container_name: spring_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      HOSTNAME: postgres
+      PORT: 5432
+      DATABASE: eavo
+      USER: eavo
+      PASSWORD: eavo123
+    networks:
+      - eavonet
+    command: ["java", "-Dspring.profiles.active=init", "-jar", "app.jar"]
+
+networks:
+  eavonet:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  postgres_test_data:
+  pgadmin_data:
